@@ -163,3 +163,47 @@ def test_save_session_rejects_bad_data(tmp_path, monkeypatch):
     with pytest.raises(ValueError):
         settings.save_session(s)
     assert not list(tmp_path.glob("*.npz"))
+
+
+# ---------- neurons.py ----------
+from src.data import neurons
+
+
+def fake_probe(n_neurons, region_ids, spike_rows):
+    clusters = pd.DataFrame({"uuids": [f"u{i}" for i in range(n_neurons)],
+                             "atlas_id": region_ids})
+    spikes = {"times": np.linspace(0, 10, len(spike_rows)),
+              "clusters": np.array(spike_rows)}
+    return spikes, clusters
+
+
+def test_probe_neurons_drops_excluded_regions():
+    spikes, clusters = fake_probe(3, [1, 2, 3], [0, 1, 2, 0, 2])
+    regions = np.array(["CA1", "root", "VISp"])
+    table, times, index = neurons.probe_neurons(spikes, clusters, regions, ["root", "void"])
+    assert list(table["region"]) == ["CA1", "VISp"]
+    assert len(times) == 4
+    assert set(index) == {0, 1}
+
+
+def test_probe_neurons_bad_cluster_rows_fail():
+    spikes, clusters = fake_probe(2, [1, 2], [0, 5])
+    with pytest.raises(ValueError, match="row numbers"):
+        neurons.probe_neurons(spikes, clusters, np.array(["CA1", "CA1"]), ["root"])
+
+
+def test_load_neurons_joins_probes(monkeypatch):
+    probes = {"p1": fake_probe(2, [1, 1], [0, 1, 1]),
+              "p2": fake_probe(3, [2, 2, 2], [0, 1, 2, 2])}
+    monkeypatch.setattr(neurons, "load_good_units", lambda one, pid, qc: probes[pid])
+
+    class FakeRegions:
+        def id2acronym(self, ids, mapping):
+            return np.array(["CA1" if i == 1 else "VISp" for i in ids])
+
+    monkeypatch.setattr(neurons, "BrainRegions", FakeRegions)
+    table, spikes = neurons.load_neurons(None, ["p1", "p2"], settings.load_config())
+    assert len(table) == 5
+    assert spikes["neuron_index"].min() == 0
+    assert spikes["neuron_index"].max() == len(table) - 1
+    assert set(spikes["neuron_index"]) == set(range(len(table)))
