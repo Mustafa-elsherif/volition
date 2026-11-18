@@ -1,6 +1,13 @@
 import numpy as np
 import pytest
 
+from src.analysis.eda import (
+    block_counts,
+    check_fields,
+    region_counts,
+    session_summary,
+    summarize_sessions,
+)
 from src.data.features import firing_rates
 
 
@@ -53,3 +60,63 @@ def test_bad_inputs_raise():
         firing_rates([0.1, 0.2], [0], 1, [0.0], [1.0])   # length mismatch
     with pytest.raises(ValueError):
         firing_rates([0.1], [0], 1, [0.0, 1.0], [1.0])   # starts/ends mismatch
+
+def _fake_session(session_id="s1"):
+    X = np.zeros((6, 3))
+    X[:, 0] = 5
+    X[1, 1] = 2
+    X[3, 1] = 4
+    return {
+        "X": X,
+        "y": np.array([1, 0, 1, 1, 0, 1]),
+        "trial_number": np.arange(6),
+        "stim_side": np.array([1, -1, 1, 1, -1, 1]),
+        "contrast": np.array([1.0, 0.5, 0.25, 0.0, 0.125, 0.0]),
+        "is_error": np.array([0, 1, 0, 0, 1, 0], dtype=bool),
+        "is_zero_contrast": np.array([1, 0, 0, 0, 0, 1], dtype=bool),
+        "prob_left": np.array([0.5, 0.5, 0.2, 0.2, 0.8, 0.8]),
+        "reaction_time": np.arange(1, 7) / 10,
+        "neuron_id": np.array(["a", "b", "c"]),
+        "neuron_region": np.array(["CA1", "CA1", "VISp"]),
+        "session_id": np.asarray(session_id),
+    }
+
+
+def test_session_summary_values():
+    s = session_summary(_fake_session())
+    assert s["n_trials"] == 6
+    assert s["n_neurons"] == 3
+    assert s["n_regions"] == 2
+    assert s["n_error_trials"] == 2
+    assert s["n_zero_contrast_trials"] == 2
+    assert s["majority_class_rate"] == pytest.approx(4 / 6)
+    assert s["rt_median"] == pytest.approx(0.35)
+    assert s["mean_rate_hz"] == pytest.approx(2.0)
+    assert s["silent_neuron_fraction"] == pytest.approx(1 / 3)
+
+
+def test_region_and_block_counts():
+    rc = region_counts(_fake_session())
+    assert rc["CA1"] == 2
+    assert rc["VISp"] == 1
+    bc = block_counts(_fake_session())
+    assert bc.loc[0.2] == 2
+    assert bc.loc[0.5] == 2
+    assert bc.loc[0.8] == 2
+
+
+def test_summarize_sessions_one_row_each():
+    sessions = [_fake_session("s1"), _fake_session("s2")]
+    df = summarize_sessions(sessions)
+    assert list(df["session_id"]) == ["s1", "s2"]
+
+
+def test_check_fields_catches_bad_data():
+    d = _fake_session()
+    del d["prob_left"]
+    with pytest.raises(ValueError):
+        check_fields(d)
+    d = _fake_session()
+    d["y"] = d["y"][:-1]
+    with pytest.raises(ValueError):
+        check_fields(d)
