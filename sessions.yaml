@@ -1,0 +1,96 @@
+sessions:
+- session_id: 746d1902-fa59-4cab-b0aa-013be36060d5
+  subject: ZFM-01592
+  lab: mainenlab
+  pids:
+  - 39883ded-f5a2-4f4f-a98e-fb138eb8433e
+  - e31b4e39-e350-47a9-aca4-72496d99ff2a
+  n_neurons: 429
+  n_regions: 17
+- session_id: ee40aece-cffd-4edb-a4b6-155f158c666a
+  subject: ZM_2241
+  lab: mainenlab
+  pids:
+  - 41b9162e-df67-4321-b2e6-02ff851816c5
+  - f03b61b4-6b13-479d-940f-d1608eb275cc
+  n_neurons: 427
+  n_regions: 15
+- session_id: f10efe41-0dc0-44d0-8f26-5ff68dca23e9
+  subject: CSHL060
+  lab: churchlandlab
+  pids:
+  - 7bc16ab1-1b0d-4f52-9e4b-210106ea344c
+  - 8d0a5caf-2be2-48c1-bf1a-f538bacd46b4
+  n_neurons: 396
+  n_regions: 9
+- session_id: 56b57c38-2699-4091-90a8-aba35103155e
+  subject: SWC_054
+  lab: mrsicflogellab
+  pids:
+  - ce24bbe9-ae70-4659-9e9c-564d1a865de8
+  - ce397420-3cd2-4a55-8fd1-5e28321981f4
+  n_neurons: 391
+  n_regions: 13
+- session_id: 4d8c7767-981c-4347-8e5e-5d5fffe38534
+  subject: SWC_038
+  lab: mrsicflogellab
+  pids:
+  - 749cb2b7-e57e-4453-a794-f6230e4d0226
+  - ea084e63-c0cb-4e11-8440-302de8fc76ee
+  n_neurons: 389
+  n_regions: 10
+- session_id: 6274dda8-3a59-4aa1-95f8-a8a549c46a26
+  subject: CSH_ZAD_025
+  lab: zadorlab
+  pids:
+  - 1bd85dab-7a53-49d1-acd4-e82f9fd07cf6
+  - f9b2e36b-eef8-402f-b121-786dfed58bcb
+  n_neurons: 349
+  n_regions: 10
+- session_id: 2bdf206a-820f-402f-920a-9e86cd5388a4
+  subject: UCLA037
+  lab: churchlandlab_ucla
+  pids:
+  - 02cc03e4-8015-4050-bb42-6c832091febb
+  - afe87fbb-3a17-461f-b333-e22903f1d70d
+  n_neurons: 346
+  n_regions: 9
+- session_id: 8207abc6-6b23-4762-92b4-82e05bed5143
+  subject: CSH_ZAD_024
+  lab: zadorlab
+  pids:
+  - 9bd71ac6-c455-41f3-8c56-59987a649ac4
+  - e22d047c-5beb-4e5b-9a3d-53b637743856
+  n_neurons: 332
+  n_regions: 8
+- session_id: dfbe628d-365b-461c-a07f-8b9911ba83aa
+  subject: KS046
+  lab: cortexlab
+  pids:
+  - ad315779-2b39-46c4-8348-b166e796fa7c
+  - df350b09-a420-42bb-9952-17862cbb9f1c
+  n_neurons: 331
+  n_regions: 7
+- session_id: 09394481-8dd2-4d5c-9327-f2753ede92d7
+  subject: ibl_witten_26
+  lab: wittenlab
+  pids:
+  - 0fcb5f66-4d56-4247-8413-aef51e484e67
+  - da57bb3a-b0f2-465d-a5fc-cc84341450b0
+  n_neurons: 326
+  n_regions: 12
+reserves:
+- aec5d3cc-4bb2-4349-80a9-0395b76f04e2
+- 19e66dc9-bf9f-430b-9d6a-acfa85de6fb7
+- eacc49a9-f3a1-49f1-b87f-0972f90ee837
+- 0f77ca5d-73c2-45bd-aa4c-4c5ed275dbde
+- aad23144-0e52-4eac-80c5-c4ee2decb198
+- 1dbba733-24a4-4400-9436-53f1bd8428e8
+- 6f09ba7e-e3ce-44b0-932b-c003fb44fb89
+- a7763417-e0d6-4f2a-aa55-e382fd9b5fb8
+- bd456d8f-d36e-434a-8051-ff3997253802
+- 54238fd6-d2d0-4408-b1a9-d19d24fd29ce
+- 93ad879a-aa42-4150-83e1-38773c9785e4
+- fb70ebf7-8175-42b0-9b7a-7c6e8612226e
+- 493170a6-fd94-4ee4-884f-cc018c17eeb9
+- d23b005f-46f5-4fe1-870c-f55f6eb9533d
