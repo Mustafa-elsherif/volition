@@ -1,12 +1,13 @@
 import numpy as np
 import pytest
 
+import pandas as pd
+
 from src.analysis.eda import (
-    block_counts,
-    check_fields,
+    find_blocks,
     region_counts,
-    session_summary,
-    summarize_sessions,
+    sessions_overview,
+    trials_overview,
 )
 from src.data.features import firing_rates
 
@@ -82,11 +83,53 @@ def _fake_session(session_id="s1"):
     }
 
 
-def test_session_summary_values():
-    s = session_summary(_fake_session())
+def test_trials_overview_one_row_per_column():
+    trials = pd.DataFrame({
+        "choice": [1.0, -1.0, np.nan],
+        "probabilityLeft": [0.5, 0.5, 0.2],
+        "name": [None, "b", "c"],
+    })
+    t = trials_overview(trials)
+    assert list(t.columns) == ["column", "type", "n_missing", "example"]
+    assert list(t["column"]) == ["choice", "probabilityLeft", "name"]
+    assert list(t["n_missing"]) == [1, 0, 1]
+    assert t.loc[0, "example"] == 1.0
+    assert t.loc[2, "example"] == "b"
+
+
+def test_trials_overview_rejects_non_dataframe():
+    with pytest.raises(TypeError):
+        trials_overview([1, 2, 3])
+
+
+def test_find_blocks_runs_in_order():
+    b = find_blocks([0.5, 0.5, 0.2, 0.2, 0.2, 0.8])
+    assert list(b.columns) == ["start", "end", "prob_left", "length"]
+    assert list(b["start"]) == [0, 2, 5]
+    assert list(b["end"]) == [1, 4, 5]
+    assert list(b["prob_left"]) == [0.5, 0.2, 0.8]
+    assert list(b["length"]) == [2, 3, 1]
+    assert b["length"].sum() == 6
+
+
+def test_find_blocks_missing_value_is_its_own_block():
+    b = find_blocks([0.8, np.nan, 0.8])
+    assert list(b["length"]) == [1, 1, 1]
+    assert np.isnan(b.loc[1, "prob_left"])
+
+
+def test_find_blocks_empty():
+    b = find_blocks([])
+    assert b.empty
+    assert list(b.columns) == ["start", "end", "prob_left", "length"]
+
+
+def test_sessions_overview_values():
+    s = sessions_overview([_fake_session()]).iloc[0]
     assert s["n_trials"] == 6
     assert s["n_neurons"] == 3
     assert s["n_regions"] == 2
+    assert s["share_y1"] == pytest.approx(4 / 6)
     assert s["n_error_trials"] == 2
     assert s["n_zero_contrast_trials"] == 2
     assert s["majority_class_rate"] == pytest.approx(4 / 6)
@@ -95,28 +138,23 @@ def test_session_summary_values():
     assert s["silent_neuron_fraction"] == pytest.approx(1 / 3)
 
 
-def test_region_and_block_counts():
-    rc = region_counts(_fake_session())
-    assert rc["CA1"] == 2
-    assert rc["VISp"] == 1
-    bc = block_counts(_fake_session())
-    assert bc.loc[0.2] == 2
-    assert bc.loc[0.5] == 2
-    assert bc.loc[0.8] == 2
-
-
-def test_summarize_sessions_one_row_each():
-    sessions = [_fake_session("s1"), _fake_session("s2")]
-    df = summarize_sessions(sessions)
+def test_sessions_overview_one_row_each():
+    df = sessions_overview([_fake_session("s1"), _fake_session("s2")])
     assert list(df["session_id"]) == ["s1", "s2"]
 
 
-def test_check_fields_catches_bad_data():
+def test_sessions_overview_catches_bad_data():
     d = _fake_session()
     del d["prob_left"]
     with pytest.raises(ValueError):
-        check_fields(d)
+        sessions_overview([d])
     d = _fake_session()
     d["y"] = d["y"][:-1]
     with pytest.raises(ValueError):
-        check_fields(d)
+        sessions_overview([d])
+
+
+def test_region_counts_largest_first():
+    rc = region_counts(np.array(["CA1", "VISp", "CA1"]))
+    assert list(rc.index) == ["CA1", "VISp"]
+    assert rc["CA1"] == 2

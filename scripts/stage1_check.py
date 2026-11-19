@@ -125,7 +125,8 @@ for name in NOTEBOOKS:
     errors = [o for c in code_cells for o in c.get("outputs", [])
               if o.get("output_type") == "error"]
     text = "".join("".join(c["source"]) for c in cells)
-    ok = (not unrun) and (not errors) and "## Plan" in text and "## Conclusions" in text
+    draft = "to be written" in text.lower()
+    ok = (not unrun) and (not errors) and "## Plan" in text and "## Conclusions" in text and not draft
     detail = []
     if unrun:
         detail.append(str(len(unrun)) + " cells not run")
@@ -135,7 +136,47 @@ for name in NOTEBOOKS:
         detail.append("no Plan cell")
     if "## Conclusions" not in text:
         detail.append("no Conclusions cell")
+    if draft:
+        detail.append("Conclusions still a draft")
     check(name, ok, ", ".join(detail))
+
+print()
+print("== 5. files match their task in the team guide ==")
+import importlib
+
+FIXED_NAMES = {
+    "src.common.settings": ["load_config", "connect_ibl", "load_session_list", "load_session_info",
+                            "make_rng", "save_session", "load_session", "list_processed_sessions",
+                            "save_predictions", "load_predictions", "save_table", "load_table",
+                            "figure_path"],
+    "src.common.checks": ["check_session", "check_predictions", "check_table"],
+    "src.data.sessions": ["main"],
+    "src.data.clean_trials": ["load_trials", "clean_trials", "check_choice_direction"],
+    "src.data.neurons": ["load_neurons"],
+    "src.data.features": ["firing_rates"],
+    "src.data.build_dataset": ["build_session", "assemble_session", "main"],
+    "src.analysis.eda": ["trials_overview", "find_blocks", "sessions_overview"],
+}
+for module, names in FIXED_NAMES.items():
+    mod = importlib.import_module(module)
+    missing = [n for n in names if not callable(getattr(mod, n, None))]
+    check(module + " has the guide's function names", not missing,
+          ("missing: " + ", ".join(missing)) if missing else "")
+
+card = (ROOT / "docs" / "data_card.md").read_text(encoding="utf-8")
+for needle, label in [
+    ("CC-BY 4.0", "licence"),
+    ("data_release_brainwidemap", "link to the official release"),
+    (config["ibl"]["release_freeze"], "release freeze"),
+    ("Final cohort", "final cohort of 10 sessions"),
+    ("Intended use and limits", "known limits"),
+]:
+    check("data card has the " + label, needle in card)
+
+nb01 = json.loads((ROOT / "notebooks" / "01_raw_data_eda.ipynb").read_text(encoding="utf-8"))
+nb01_code = "".join("".join(c["source"]) for c in nb01["cells"] if c["cell_type"] == "code")
+check("notebook 01 loads the raw data with IBL's loaders",
+      "load_trials(" in nb01_code and "load_neurons(" in nb01_code and "load_session(" not in nb01_code)
 
 print()
 if failures:
