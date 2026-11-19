@@ -20,7 +20,7 @@ from src.common.settings import (
 from src.data.clean_trials import clean_trials, load_trials
 
 NOTEBOOKS = [
-    "01_first_look_at_data",
+    "01_raw_data_eda",
     "02_sessions_and_dataset",
     "03_trial_cleaning",
     "04_neurons_and_regions",
@@ -142,3 +142,4 @@ if failures:
     print("STAGE 1 FAILED. Problems: " + ", ".join(failures))
     raise SystemExit(1)
 print("STAGE 1 PASSED. All checks above are green.")
+
