@@ -2,6 +2,15 @@
 
 This project uses International Brain Laboratory (IBL) Brain-Wide Map trials and neural recordings to study how well pre-movement neural activity predicts a mouse's binary wheel choice. The configured frozen release is `2023_12_bwm_release`, with aggregate table tag `2024_Q2_IBL_et_al_BWM`.
 
+| Item | Value |
+| --- | --- |
+| Dataset | IBL Brain-Wide Map ([official data release page](https://docs.internationalbrainlab.org/notebooks_external/data_release_brainwidemap.html)) |
+| Data server | https://openalyx.internationalbrainlab.org (public read-only database, reached with ONE-api) |
+| Release freeze | `2023_12_bwm_release` — 459 sessions, 699 probe insertions, 139 mice, 12 labs |
+| Aggregate table tag | `2024_Q2_IBL_et_al_BWM` |
+| Licence | CC-BY 4.0 — free to use and share; the International Brain Laboratory must be credited |
+| Loading code | `ONE-api` 3.6.1 and IBL's `brainwidemap` package (commit `118fc36`), pinned in [requirements.txt](../requirements.txt) |
+
 ## Cohort and neural features
 
 The team configuration targets 10 sessions with at most two per lab. The following thresholds come from [config.yaml](../config.yaml). The final session manifest is in [sessions.yaml](../sessions.yaml).
