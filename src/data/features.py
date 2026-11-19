@@ -2,7 +2,7 @@
 
 Counts the spikes of every neuron inside each trial's window and divides by
 the window length, so the result is in Hz. The caller decides the window
-(build_dataset.py uses movement time + (-0.2, 0.0)), so nothing after movement
+(build_dataset.py uses movement time + (-0.1, 0.0)), so nothing after movement
 onset can enter the features as long as `ends` is at or before movement onset.
 """
 from __future__ import annotations
