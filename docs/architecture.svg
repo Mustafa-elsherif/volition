@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 320" width="860" height="320" font-family="Archivo, Arial, sans-serif" role="img" aria-label="Volition architecture">
+  <style>
+    .bg { fill: #ffffff; }
+    .box { fill: #f7f9fb; stroke: #d9e0e7; }
+    .t { fill: #0e1621; } .m { fill: #5b6774; } .lbl { fill: #8392a1; }
+    .edge { stroke: #b6c0ca; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0b0f14; } .box { fill: #11161d; stroke: #1e2731; }
+      .t { fill: #e7edf3; } .m { fill: #8392a1; } .lbl { fill: #6b7684; } .edge { stroke: #2c3845; }
+    }
+    .t { font-size: 14px; font-weight: 700; }
+    .m { font-size: 11px; }
+    .lbl { font-size: 10px; letter-spacing: 1.5px; font-family: "JetBrains Mono", monospace; }
+  </style>
+  <rect class="bg" width="860" height="320" rx="10"/>
+
+  <!-- data -->
+  <rect class="box" x="24" y="110" width="150" height="88" rx="8"/>
+  <text class="lbl" x="40" y="132">DATA</text>
+  <text class="t" x="40" y="156">IBL Brain-Wide Map</text>
+  <text class="m" x="40" y="176">10 sessions, 10 mice</text>
+  <text class="m" x="40" y="190">CC-BY 4.0</text>
+
+  <!-- features -->
+  <rect class="box" x="208" y="110" width="150" height="88" rx="8"/>
+  <text class="lbl" x="224" y="132">FEATURES</text>
+  <text class="t" x="224" y="156">Firing rates</text>
+  <text class="m" x="224" y="176">-100 ms to movement</text>
+  <text class="m" x="224" y="190">z-scored per neuron</text>
+
+  <!-- model -->
+  <rect class="box" x="392" y="96" width="176" height="116" rx="8"/>
+  <text class="lbl" x="408" y="120">MODEL</text>
+  <text class="t" x="408" y="144">Neuron-set transformer</text>
+  <text class="m" x="408" y="164">token = rate + region</text>
+  <text class="m" x="408" y="180">attention pooling</text>
+  <text class="m" x="408" y="196">choice head</text>
+
+  <!-- artifact -->
+  <rect class="box" x="602" y="110" width="150" height="88" rx="8"/>
+  <text class="lbl" x="618" y="132">ARTIFACT</text>
+  <text class="t" x="618" y="156">decoder.onnx</text>
+  <text class="m" x="618" y="176">probability</text>
+  <text class="m" x="618" y="190">+ attention</text>
+
+  <!-- consumers -->
+  <rect class="box" x="700" y="24" width="150" height="58" rx="8"/>
+  <text class="t" x="716" y="48">Browser demo</text>
+  <text class="m" x="716" y="66">ONNX Runtime Web</text>
+
+  <rect class="box" x="700" y="226" width="150" height="58" rx="8"/>
+  <text class="t" x="716" y="250">FastAPI backend</text>
+  <text class="m" x="716" y="268">Dockerized REST</text>
+
+  <!-- edges -->
+  <g class="edge" stroke-width="1.6" fill="none">
+    <path d="M174 154 H208" marker-end="url(#a)"/>
+    <path d="M358 154 H392" marker-end="url(#a)"/>
+    <path d="M568 154 H602" marker-end="url(#a)"/>
+    <path d="M752 140 C782 140 775 70 775 82" marker-end="url(#a)"/>
+    <path d="M752 168 C782 168 775 226 775 226" marker-end="url(#a)"/>
+  </g>
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0 0l6 3-6 3z" fill="#8392a1"/>
+    </marker>
+  </defs>
+</svg>

@@ -134,7 +134,6 @@ sparse==0.19.2
 stack-data==0.6.3
 starlette==1.8.0
 statsmodels==0.15.0
-streamlit==1.66.0
 threadpoolctl==3.7.0
 tifffile==2026.10.15
 tinycss2==1.5.1

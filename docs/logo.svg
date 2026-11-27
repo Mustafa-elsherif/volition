@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 60" width="320" height="60" role="img" aria-label="Volition">
+  <style>
+    .word { font-family: Archivo, Arial, sans-serif; font-weight: 800; font-size: 34px; letter-spacing: -0.5px; fill: #0e1621; }
+    @media (prefers-color-scheme: dark) { .word { fill: #e7edf3; } }
+  </style>
+  <g transform="translate(6,8)" stroke-linecap="round" fill="none">
+    <g stroke="#ffb24c" stroke-width="4"><path d="M8 40V26"/><path d="M18 40V14"/><path d="M28 40V30"/></g>
+    <path d="M36 18l10 10-10 10" stroke="#6ea8ff" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+  <text x="70" y="42" class="word">Volition</text>
+</svg>

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Volition — neural choice decoder</title>
+<meta name="description" content="Volition decodes a mouse's choice from neural population activity before it moves, with one model that runs in your browser and explains every prediction." />
+<meta name="color-scheme" content="dark light" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='6' fill='%230B0F14'/%3E%3Cg stroke='%23FFB24C' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 19V13M11 19V8M16 19V15'/%3E%3C/g%3E%3Cpath d='M19 10l4 4-4 4' fill='none' stroke='%236EA8FF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<script>
+  // Set theme before paint to avoid a flash.
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search).get("theme");
+      var t = q || localStorage.getItem("volition-theme");
+      if (t) document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+<script src="vendor/ort/ort.wasm.min.js"></script>
+</head>
+<body>
+<a class="skip" href="#workbench">Skip to the decoder</a>
+
+<header class="topbar">
+  <a class="brand" href="#top" aria-label="Volition home">
+    <svg class="brand-mark" viewBox="0 0 28 28" width="28" height="28" aria-hidden="true">
+      <g class="mark-spikes" stroke-width="2" stroke-linecap="round" fill="none">
+        <path d="M5 19V12" /><path d="M9 19V7" /><path d="M13 19V14" />
+      </g>
+      <path class="mark-arrow" d="M17 9l5 5-5 5" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <span class="brand-word">Volition</span>
+  </a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="#workbench">Decoder</a>
+    <a href="#model">Model</a>
+    <a href="#api">API</a>
+    <a href="#assistant">Assistant</a>
+    <a class="ext" href="https://github.com/Mustafa-elsherif/volition">GitHub</a>
+  </nav>
+  <button id="theme-toggle" class="icon-btn" aria-label="Switch theme" title="Switch theme">
+    <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke-width="1.8"/><g stroke-width="1.8" stroke-linecap="round"><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5 5l1.8 1.8M17.2 17.2L19 19M19 5l-1.8 1.8M6.8 17.2L5 19"/></g></svg>
+    <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="none" stroke-width="1.8" stroke-linejoin="round"/></svg>
+  </button>
+</header>
+
+<main id="top">
+  <!-- FIRST VIEWPORT: the mechanism is the hero -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-stage">
+      <div class="stage-head">
+        <span class="instrument-label">Pre-movement window · −100 ms to 0</span>
+        <span class="instrument-label" id="hero-session">session —</span>
+      </div>
+      <canvas id="raster" class="raster" aria-label="Spike raster of one trial resolving into a decoded choice"></canvas>
+      <div class="readout">
+        <div class="axis" id="hero-axis" role="img" aria-label="Decoded choice probability axis">
+          <span class="pole pole-left">Left<br><em>choice −1</em></span>
+          <div class="axis-track"><div class="axis-needle" id="hero-needle"></div></div>
+          <span class="pole pole-right">Right<br><em>choice +1</em></span>
+        </div>
+        <div class="readout-value"><span id="hero-prob" class="mono">—</span><span class="readout-unit">P(right)</span></div>
+      </div>
+    </div>
+    <div class="hero-copy">
+      <h1 id="hero-title">Read the choice before the move.</h1>
+      <p>Volition decodes which way a mouse chose from the firing of its neurons in the last tenth of a second before it moves the wheel. One model reads any set of neurons, runs here in your browser, and shows you which cells and brain regions drove the call.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" data-scroll="#workbench">Decode a trial</button>
+        <a class="btn btn-ghost" href="#model">See the honest results</a>
+      </div>
+      <p class="hero-note mono" id="hero-status">loading model…</p>
+    </div>
+  </section>
+
+  <!-- OPERATE CORE: the workbench -->
+  <section id="workbench" class="section" aria-labelledby="wb-title">
+    <div class="section-head">
+      <h2 id="wb-title">Decoder workbench</h2>
+      <p>Pick a real trial from the Brain-Wide Map, run the decoder, and read the prediction against the recorded truth. Nothing leaves your browser.</p>
+    </div>
+
+    <div class="wb-grid">
+      <div class="panel wb-controls">
+        <div class="field">
+          <label for="trial-select" class="instrument-label">Sample trial</label>
+          <select id="trial-select" class="select"></select>
+        </div>
+        <div class="trial-facts mono" id="trial-facts"></div>
+        <div class="wb-buttons">
+          <button id="decode-btn" class="btn btn-primary" disabled>Run decode</button>
+          <button id="random-btn" class="btn btn-ghost">Random trial</button>
+        </div>
+        <p class="wb-hint">The decoder sees only the firing rates and each neuron's brain region. The recorded choice is hidden until you run it.</p>
+      </div>
+
+      <div class="panel wb-result" id="wb-result" aria-live="polite">
+        <div class="result-empty" id="result-empty">
+          <p>No trial decoded yet. Choose one and run the decoder.</p>
+        </div>
+        <div class="result-body" id="result-body" hidden>
+          <div class="result-top">
+            <div class="result-call">
+              <span class="instrument-label">Decoded choice</span>
+              <strong id="r-choice" class="mono">—</strong>
+              <span id="r-verdict" class="verdict"></span>
+            </div>
+            <div class="result-conf">
+              <span class="instrument-label">Confidence</span>
+              <strong id="r-conf" class="mono">—</strong>
+            </div>
+          </div>
+          <div class="axis result-axis" role="img" aria-label="Predicted probability on the left to right axis">
+            <span class="pole pole-left">Left</span>
+            <div class="axis-track"><div class="axis-needle" id="r-needle"></div><div class="axis-mid"></div></div>
+            <span class="pole pole-right">Right</span>
+          </div>
+          <div class="result-prob mono"><span id="r-prob">—</span> probability of right choice</div>
+          <div class="contrib">
+            <span class="instrument-label">Region contribution · pooling attention</span>
+            <div id="region-bars" class="region-bars"></div>
+          </div>
+          <details class="neuron-details">
+            <summary>Top neurons by attention</summary>
+            <div id="neuron-list" class="neuron-list mono"></div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- honest results -->
+  <section id="model" class="section section-alt" aria-labelledby="model-title">
+    <div class="section-head">
+      <h2 id="model-title">What is true about the model</h2>
+      <p>Every number here comes from trials the model never trained on, averaged over three seeds. The strong within-session baselines are shown next to the shared model, not hidden behind it.</p>
+    </div>
+
+    <div class="metrics-grid" id="metrics-grid"></div>
+
+    <div class="findings">
+      <article class="panel finding">
+        <h3>One model across sessions</h3>
+        <p id="finding-shared">The shared neuron-set transformer decodes choice well above chance across ten mice with a single set of weights, and its probabilities are well calibrated.</p>
+      </article>
+      <article class="panel finding">
+        <h3>The cost of sharing</h3>
+        <p id="finding-cost">Linear and forest decoders retrained for one animal are more accurate. Reading a variable, shared neuron set across animals trades accuracy for one deployable, interpretable model.</p>
+      </article>
+      <article class="panel finding">
+        <h3>A new animal is near chance</h3>
+        <p id="finding-cross">Predicting a mouse the model never saw, from shared regions alone, stays close to chance for every method tested. Pre-movement choice signals here do not transfer across animals.</p>
+      </article>
+    </div>
+
+    <div class="panel robust">
+      <div class="robust-head">
+        <h3>Graceful under loss</h3>
+        <p>Because the model reads a set, neurons can be dropped at decode time. Accuracy falls gradually as a growing fraction is removed.</p>
+      </div>
+      <div id="robust-chart" class="robust-chart" role="img" aria-label="Balanced accuracy as neurons are dropped"></div>
+    </div>
+  </section>
+
+  <!-- assistant -->
+  <section id="assistant" class="section" aria-labelledby="asst-title">
+    <div class="section-head">
+      <h2 id="asst-title">Ask about the method</h2>
+      <p>A grounded assistant that answers only from Volition's own knowledge base. Ask in your language.</p>
+    </div>
+    <div class="panel chat">
+      <div id="chat-log" class="chat-log" aria-live="polite"></div>
+      <div id="chat-followups" class="chat-followups"></div>
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" class="chat-input" type="text" autocomplete="off"
+               placeholder="How does the model work?" aria-label="Ask the assistant" />
+        <button class="btn btn-primary" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12h14M12 5l7 7-7 7" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- api -->
+  <section id="api" class="section section-alt" aria-labelledby="api-title">
+    <div class="section-head">
+      <h2 id="api-title">Decode from your own code</h2>
+      <p>The same model is served by a FastAPI backend. Send a trial as a list of neurons, each with a z-scored firing rate and a Beryl region.</p>
+    </div>
+    <div class="api-grid">
+      <pre class="code mono" aria-label="Example request"><code id="code-sample"></code></pre>
+      <div class="api-endpoints">
+        <div class="endpoint"><span class="verb">POST</span><span class="path mono">/decode</span><span class="desc">Decode one trial, with per-neuron and per-region attributions.</span></div>
+        <div class="endpoint"><span class="verb">GET</span><span class="path mono">/model-info</span><span class="desc">Model metadata and held-out metrics.</span></div>
+        <div class="endpoint"><span class="verb">GET</span><span class="path mono">/samples</span><span class="desc">Bundled sample trials.</span></div>
+        <div class="endpoint"><span class="verb">POST</span><span class="path mono">/assistant</span><span class="desc">Grounded multilingual assistant.</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="foot-brand">
+    <svg viewBox="0 0 28 28" width="22" height="22" aria-hidden="true"><g class="mark-spikes" stroke-width="2" stroke-linecap="round" fill="none"><path d="M5 19V12"/><path d="M9 19V7"/><path d="M13 19V14"/></g><path class="mark-arrow" d="M17 9l5 5-5 5" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Volition</span>
+  </div>
+  <p class="foot-note">Data: International Brain Laboratory Brain-Wide Map, CC-BY 4.0. Volition decodes an offline research dataset, not a live brain-computer interface.</p>
+  <p class="foot-meta mono">MIT licensed · <a href="https://github.com/Mustafa-elsherif/volition">source</a></p>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

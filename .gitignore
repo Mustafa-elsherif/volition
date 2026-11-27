@@ -5,3 +5,20 @@ __pycache__/
 data/raw/
 .env
 data/processed/
+
+# Research paper and all research materials stay local, never committed.
+paper/
+research/
+*.tex
+*.aux
+*.bbl
+*.blg
+*.pdf
+*.synctex.gz
+
+# Node / frontend build
+node_modules/
+web/dist/
+
+# Impeccable design-tool working state
+.impeccable/

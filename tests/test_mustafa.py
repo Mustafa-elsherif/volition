@@ -131,7 +131,7 @@ def test_wrong_table_columns_fails():
 # ---------- settings ----------
 
 def test_load_config():
-    assert settings.load_config()["project_name"] == "brain-decoding"
+    assert settings.load_config()["project_name"] == "volition"
 
 
 def test_make_rng_same_names_same_numbers():
