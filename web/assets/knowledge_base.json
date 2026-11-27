@@ -32,7 +32,7 @@
   {
     "id": "performance",
     "title": "How well it works",
-    "tags": ["performance", "accuracy", "auc", "metrics", "results", "score"],
+    "tags": ["performance", "perform", "performs", "accuracy", "accurate", "auc", "metrics", "results", "score", "works", "good", "strong", "reliable"],
     "text": "Performance is measured on held-out trials the model never trained on, averaged over several seeds. The single shared transformer decodes choice well above chance and is well calibrated. Per-session models that are retrained for one animal reach higher accuracy, which is the price of one model that spans animals. The exact current numbers are reported in the model card and the dashboard."
   },
   {
