@@ -24,7 +24,7 @@ quality and minimum neuron, trial, error, and region counts. Trials are cleaned 
 the official IBL inclusion criteria and aligned to the first wheel movement. Features
 are firing rates in the window from -100 ms to movement onset (half-open, so a spike
 at movement onset is excluded). Firing rates are z-scored per neuron using only that
-session's trials, which uses no labels. See [docs/data_card.md](docs/data_card.md).
+session's trials, which uses no labels. See [docs/data_card.md](data_card.md).
 
 ## Training procedure
 
