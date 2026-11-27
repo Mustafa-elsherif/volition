@@ -25,13 +25,35 @@ const STOP = new Set("the a an of to and or is are in on for with how what does 
 
 let docs = [];
 let idf = {};
+let i18n = {};
 
 function tokenize(s) {
-  return (s.toLowerCase().match(/[a-z0-9]+/g) || []).filter((t) => !STOP.has(t));
+  return ((s.toLowerCase().match(/[a-z0-9]+/g)) || []).filter((t) => !STOP.has(t));
+}
+
+// Unicode-aware tokens, for languages beyond the Latin keyword set.
+function uniTokens(s) {
+  return (s.toLowerCase().match(/[\p{L}\p{N}]+/gu) || []);
+}
+
+function detectLang(query) {
+  if (/[؀-ۿ]/.test(query)) return i18n.ar ? "ar" : "en";
+  const toks = new Set(uniTokens(query));
+  let best = "en", bestScore = 0;
+  for (const lang of ["es", "fr"]) {
+    if (!i18n[lang]) continue;
+    let score = 0;
+    for (const t of Object.values(i18n[lang].topics)) {
+      for (const k of t.k) if (toks.has(k.toLowerCase())) score++;
+    }
+    if (score > bestScore) { bestScore = score; best = lang; }
+  }
+  return bestScore > 0 ? best : "en";
 }
 
 export async function loadAssistant(assetBase = "assets") {
   docs = await fetch(`${assetBase}/knowledge_base.json`).then((r) => r.json());
+  try { i18n = await fetch(`${assetBase}/i18n.json`).then((r) => r.json()); } catch (e) { i18n = {}; }
   const df = {};
   docs.forEach((d) => {
     const terms = new Set(tokenize(`${d.title} ${d.tags.join(" ")} ${d.text}`));
@@ -98,6 +120,21 @@ function metricsLine(metrics) {
   return "";
 }
 
+function localAnswerLang(q, lang) {
+  const pack = i18n[lang];
+  if (GREETINGS.has(q.toLowerCase()))
+    return { answer: pack.greeting, followups: pack.followups, grounded: true, source: "local-" + lang };
+  const toks = new Set(uniTokens(q));
+  let bestId = null, bestScore = 0;
+  for (const [id, t] of Object.entries(pack.topics)) {
+    let s = 0;
+    for (const k of t.k) if (toks.has(k.toLowerCase())) s++;
+    if (s > bestScore) { bestScore = s; bestId = id; }
+  }
+  if (!bestId) return { answer: pack.guard, followups: pack.followups, grounded: true, source: "local-" + lang };
+  return { answer: pack.topics[bestId].a, followups: pack.followups, grounded: true, source: "local-" + lang };
+}
+
 function localAnswer(message, metrics) {
   const q = (message || "").trim();
   if (!q) {
@@ -105,6 +142,8 @@ function localAnswer(message, metrics) {
       followups: ["What is Volition?", "How does the model work?", "How well does it perform?"],
       grounded: true, source: "empty" };
   }
+  const lang = detectLang(q);
+  if (lang !== "en") return localAnswerLang(q, lang);
   const greet = GREETINGS.has(q.toLowerCase());
   const hits = retrieve(q, 3);
   if (hits[0].score < 0.04 && !greet) {
