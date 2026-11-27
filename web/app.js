@@ -175,13 +175,17 @@ function pm(m) { return m && m.std != null ? `±${m.std.toFixed(2)}` : ""; }
 
 function renderMetrics() {
   if (!metrics) return;
+  const rob50 = (metrics.robustness || []).find((p) => Math.abs(p.level - 0.5) < 1e-6);
+  const robV = rob50 ? rob50.roc_auc.toFixed(2) : "—";
   const cards = [
     { name: "Shared model · ROC AUC", v: fmt(metrics.shared_auc), pm: pm(metrics.shared_auc), sub: "one model, held-out trials, 10 sessions", lead: true },
     { name: "Shared model · balanced acc", v: fmt(metrics.shared_bacc), pm: pm(metrics.shared_bacc), sub: "chance is 0.50" },
     { name: "Calibration · ECE", v: fmt(metrics.shared_ece), pm: pm(metrics.shared_ece), sub: "lower is better, 0 is perfect" },
+    { name: "Robustness · AUC", v: robV, pm: "", sub: "with half the neurons removed" },
     { name: "Per-session logistic · AUC", v: fmt(metrics.logreg_auc), pm: pm(metrics.logreg_auc), sub: "retrained per animal (reference)" },
     { name: "Per-session forest · AUC", v: fmt(metrics.rf_auc), pm: pm(metrics.rf_auc), sub: "retrained per animal (reference)" },
     { name: "New animal · AUC", v: fmt(metrics.cross_auc), pm: pm(metrics.cross_auc), sub: "leave-one-session-out, near chance" },
+    { name: "Cohort", v: "10", pm: "", sub: "mice · 3,716 neurons · 4,872 trials" },
   ];
   $("#metrics-grid").innerHTML = cards.map((c) => `
     <div class="metric ${c.lead ? "lead" : ""}">
