@@ -1,0 +1,50 @@
+{
+  "ar": {
+    "name": "العربية",
+    "greeting": "مرحبًا. أنا مساعد فوليشن. أستطيع شرح النموذج والبيانات والنتائج وكيفية استخدام العرض.",
+    "guard": "أستطيع المساعدة فقط في مواضيع فوليشن: مهمة فك التشفير، والبيانات، والنموذج، وأداءه، وكيف يفسّر تنبؤاته. اسألني عن أي منها.",
+    "followups": ["كيف يعمل النموذج؟", "ما مدى دقته؟", "هل يعمل على فأر جديد؟"],
+    "topics": {
+      "overview": {"k": ["فوليشن", "ما", "تعريف", "هو", "ماهو"], "a": "فوليشن أداة لفك تشفير القرارات العصبية. تقرأ معدلات إطلاق الخلايا العصبية في دماغ الفأر في العُشر الأخير من الثانية قبل تحريك العجلة، وتتنبأ بالاتجاه الذي اختاره الفأر. نموذج واحد يعمل عبر كل الجلسات وداخل المتصفح."},
+      "model": {"k": ["النموذج", "المحول", "كيف", "يعمل", "الانتباه", "البنية"], "a": "النموذج محوّل يعالج الخلايا العصبية كمجموعة غير مرتبة. كل خلية تُمثَّل بمعدل إطلاقها ومنطقتها الدماغية، وآلية الانتباه تجمعها للتنبؤ بالقرار. لذلك يتعامل مع أي عدد من الخلايا ومع غياب بعضها."},
+      "dataset": {"k": ["البيانات", "بيانات", "المصدر", "الفئران", "الجلسات"], "a": "البيانات من مشروع الخريطة الدماغية الشاملة للمختبر الدولي للدماغ، وهي بيانات عامة برخصة CC-BY 4.0، عشر جلسات من عشرة فئران."},
+      "performance": {"k": ["الأداء", "الدقة", "دقة", "دقته", "مدى", "النتائج", "جيد", "نتيجة"], "a": "يُقاس الأداء على تجارب لم يتدرب عليها النموذج. يحقق النموذج المشترك مساحة تحت المنحنى نحو 0.75 وهو جيد المعايرة. النماذج المدربة لكل فأر على حدة أدق، وهذا ثمن النموذج الواحد الذي يعمل عبر الحيوانات."},
+      "crosssession": {"k": ["جديد", "فأر", "تعميم", "ينتقل", "حيوان"], "a": "التنبؤ بقرار فأر لم يره النموذج من قبل يبقى قريبًا من مستوى الصدفة. إشارات القرار قبل الحركة هنا لا تنتقل بين الحيوانات عبر المناطق المشتركة، ونعرض هذه النتيجة بصدق."},
+      "robustness": {"k": ["حذف", "خلايا", "المتانة", "غياب", "ناقصة"], "a": "لأن النموذج يقرأ مجموعة من الخلايا، يمكن حذف بعضها وقت التنبؤ. تنخفض الدقة تدريجيًا كلما حُذف عدد أكبر من الخلايا بدل أن تنهار."},
+      "explanation": {"k": ["تفسير", "لماذا", "الانتباه", "يشرح", "المساهمة"], "a": "كل تنبؤ مصحوب بوزن الانتباه على الخلايا. نعرض الخلايا الأكثر تأثيرًا ونجمع الانتباه حسب المنطقة الدماغية، لترى على أي المناطق استند القرار."},
+      "limits": {"k": ["حدود", "قيود", "عيوب", "محدودية"], "a": "فوليشن يفك تشفير بيانات بحثية غير آنية، وليس واجهة دماغ-حاسوب حية. النتائج تخص التجارب المحتفظ بها والنافذة الزمنية المختارة، والنموذج لا يُعمّم على حيوان جديد."}
+    }
+  },
+  "es": {
+    "name": "Español",
+    "greeting": "Hola. Soy el asistente de Volition. Puedo explicar el modelo, los datos, los resultados y cómo usar la demostración.",
+    "guard": "Solo puedo ayudar con Volition: la tarea de decodificación, los datos, el modelo, su rendimiento y cómo explica sus predicciones. Pregúntame sobre cualquiera de estos temas.",
+    "followups": ["¿Cómo funciona el modelo?", "¿Qué tan bien funciona?", "¿Funciona con un ratón nuevo?"],
+    "topics": {
+      "overview": {"k": ["volition", "qué", "que", "es", "hace"], "a": "Volition es un decodificador de decisiones neuronales. Lee las tasas de disparo de las neuronas en el cerebro de un ratón en la última décima de segundo antes de mover la rueda y predice qué eligió. Un solo modelo funciona en todas las sesiones y se ejecuta en el navegador."},
+      "model": {"k": ["modelo", "funciona", "cómo", "como", "atención", "arquitectura"], "a": "El modelo es un transformador que trata las neuronas como un conjunto sin orden. Cada neurona se representa por su tasa de disparo y su región cerebral, y la atención las combina para predecir la decisión. Así maneja cualquier número de neuronas y la ausencia de algunas."},
+      "dataset": {"k": ["datos", "fuente", "ratones", "sesiones", "dataset"], "a": "Los datos provienen del Brain-Wide Map del International Brain Laboratory, datos públicos con licencia CC-BY 4.0, diez sesiones de diez ratones."},
+      "performance": {"k": ["rendimiento", "precisión", "precision", "resultados", "exactitud"], "a": "El rendimiento se mide en ensayos que el modelo nunca vio. El modelo compartido alcanza un AUC cercano a 0,75 y está bien calibrado. Los modelos reentrenados por animal son más precisos, ese es el costo de un solo modelo que abarca animales."},
+      "crosssession": {"k": ["nuevo", "ratón", "raton", "generaliza", "animal"], "a": "Predecir la decisión de un ratón que el modelo nunca vio se mantiene cerca del azar. Las señales de decisión previas al movimiento aquí no se transfieren entre animales mediante regiones compartidas, y lo informamos con honestidad."},
+      "robustness": {"k": ["eliminar", "neuronas", "robustez", "faltan", "pérdida"], "a": "Como el modelo lee un conjunto, se pueden eliminar neuronas al predecir. La precisión baja de forma gradual a medida que se elimina una fracción mayor, en lugar de romperse."},
+      "explanation": {"k": ["explica", "por qué", "porque", "atención", "contribución"], "a": "Cada predicción viene con la atención sobre las neuronas. Mostramos las neuronas más influyentes y sumamos la atención por región cerebral, para ver en qué regiones se apoyó la decisión."},
+      "limits": {"k": ["límites", "limites", "limitaciones", "restricciones"], "a": "Volition decodifica un conjunto de datos de investigación sin conexión, no una interfaz cerebro-computadora en vivo. Los resultados valen para los ensayos retenidos y la ventana elegida, y el modelo no generaliza a un animal nuevo."}
+    }
+  },
+  "fr": {
+    "name": "Français",
+    "greeting": "Bonjour. Je suis l'assistant de Volition. Je peux expliquer le modèle, les données, les résultats et comment utiliser la démonstration.",
+    "guard": "Je ne peux aider que sur Volition : la tâche de décodage, les données, le modèle, ses performances et la façon dont il explique ses prédictions. Posez-moi une question sur l'un de ces sujets.",
+    "followups": ["Comment fonctionne le modèle ?", "Quelle est sa performance ?", "Fonctionne-t-il sur une nouvelle souris ?"],
+    "topics": {
+      "overview": {"k": ["volition", "quoi", "qu'est", "est", "fait"], "a": "Volition est un décodeur de décisions neuronales. Il lit les taux de décharge des neurones dans le cerveau d'une souris dans le dernier dixième de seconde avant qu'elle ne bouge la roue et prédit son choix. Un seul modèle fonctionne sur toutes les sessions et s'exécute dans le navigateur."},
+      "model": {"k": ["modèle", "modele", "fonctionne", "comment", "attention", "architecture"], "a": "Le modèle est un transformeur qui traite les neurones comme un ensemble non ordonné. Chaque neurone est représenté par son taux de décharge et sa région cérébrale, et l'attention les regroupe pour prédire la décision. Il gère ainsi n'importe quel nombre de neurones et l'absence de certains."},
+      "dataset": {"k": ["données", "donnees", "source", "souris", "sessions"], "a": "Les données proviennent du Brain-Wide Map de l'International Brain Laboratory, des données publiques sous licence CC-BY 4.0, dix sessions de dix souris."},
+      "performance": {"k": ["performance", "précision", "precision", "résultats", "exactitude"], "a": "La performance est mesurée sur des essais que le modèle n'a jamais vus. Le modèle partagé atteint une AUC proche de 0,75 et est bien calibré. Les modèles réentraînés par animal sont plus précis, c'est le prix d'un seul modèle qui couvre plusieurs animaux."},
+      "crosssession": {"k": ["nouvelle", "souris", "généralise", "generalise", "animal"], "a": "Prédire la décision d'une souris que le modèle n'a jamais vue reste proche du hasard. Les signaux de décision avant le mouvement ne se transfèrent pas entre animaux via des régions partagées, et nous le rapportons honnêtement."},
+      "robustness": {"k": ["supprimer", "neurones", "robustesse", "manquent", "perte"], "a": "Comme le modèle lit un ensemble, on peut supprimer des neurones au moment de la prédiction. La précision baisse progressivement à mesure qu'une fraction plus grande est retirée, au lieu de s'effondrer."},
+      "explanation": {"k": ["explique", "pourquoi", "attention", "contribution"], "a": "Chaque prédiction s'accompagne de l'attention sur les neurones. Nous montrons les neurones les plus influents et sommons l'attention par région cérébrale, pour voir sur quelles régions la décision s'est appuyée."},
+      "limits": {"k": ["limites", "limitations", "contraintes"], "a": "Volition décode un jeu de données de recherche hors ligne, pas une interface cerveau-machine en direct. Les résultats valent pour les essais retenus et la fenêtre choisie, et le modèle ne généralise pas à un nouvel animal."}
+    }
+  }
+}
