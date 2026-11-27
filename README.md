@@ -1,85 +1,153 @@
-﻿# Brain Decoding: Reliable Pre-Movement Neural Decoding
+﻿<p align="center">
+  <img src="docs/logo.svg" alt="Volition" width="300" />
+</p>
 
-## Summary
+<p align="center">
+  <b>Decode a mouse's choice from neural population activity before it moves.</b><br>
+  One shared model, runs in your browser, explains every prediction.
+</p>
 
-A mouse sees a picture on the left or right of a screen and turns a wheel to answer. Thin probes record its neurons. We take the firing rate of each neuron in the 0.1 s before the first wheel movement and train a simple model to predict the mouse's choice. Then we test how reliable the prediction stays when there is less training data, or when some neurons or a whole brain region are missing.
+<p align="center">
+  <a href="https://mustafa-elsherif.github.io/volition/">Live demo</a> ·
+  <a href="#results">Results</a> ·
+  <a href="#api">API</a> ·
+  <a href="MODEL_CARD.md">Model card</a> ·
+  <a href="DEPLOYMENT.md">Deployment</a>
+</p>
 
-## Research question
+---
 
-How reliably can a simple model predict the mouse's choice from brain activity before movement, when (a) the training data is reduced, and (b) some neurons or a whole brain region are missing?
+Volition reads the firing rates of recorded neurons in the 0.1 second before a mouse
+moves a wheel and predicts which way it chose. The decoder is a single
+permutation-invariant set transformer: each neuron is a token made of its firing rate
+and its brain region, so one set of weights reads sessions that have completely
+different neurons. It runs client-side with ONNX Runtime Web, and every prediction
+comes with the pooling attention over neurons and brain regions.
 
-## Dataset
+The project is built on the public [IBL Brain-Wide Map](https://www.internationalbrainlab.com/)
+(CC-BY 4.0), ten sessions from ten mice.
 
-- **IBL Brain-Wide Map** (frozen release `2023_12_bwm_release`), 10 sessions from 10 different mice.
-- Access: public, through ONE-api and `brainwidemap` (https://openalyx.internationalbrainlab.org).
-- Licence: **CC-BY 4.0**. We must cite it (see References).
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" alt="Volition dashboard" width="860" />
+</p>
 
-## Stages
+## What it does
 
-| Stage | Days | What we make |
+- **Decodes choice** from pre-movement neural population activity, above chance with one shared model across ten animals.
+- **Explains predictions** with per-neuron and per-region pooling attention.
+- **Runs in the browser** on real sample trials, with no server and no data leaving the page.
+- **Reports honestly**, including where the method is weaker than per-session baselines and where it fails to generalize.
+
+## Results
+
+All numbers are held-out, averaged over three seeds (mean ± std). "Shared model" is
+one neuron-set transformer evaluated on trials it never trained on, pooled across the
+ten sessions. The per-session references are retrained for a single animal.
+
+| Decoder | ROC AUC | Balanced accuracy |
 |---|---|---|
-| 0. Setup | Oct 20 | the repo and the shared settings |
-| 1. Data | Oct 21 - Oct 23 | 10 clean, ready session files |
-| 2. Models | Oct 24 - Oct 26 | the predictions of the 6 experiments |
-| 3. Evaluation | Oct 27 - Oct 28 | the 8 result tables and their notebooks |
-| 4. Delivery | Oct 29 - Oct 30 | figures, dashboard, one command, report, v1.0 |
+| **Shared neuron-set transformer** | **0.748 ± 0.026** | 0.685 ± 0.017 |
+| Per-session logistic regression | 0.888 ± 0.009 | 0.821 ± 0.013 |
+| Per-session random forest | 0.930 ± 0.005 | 0.859 ± 0.005 |
+| Majority / base rate | 0.612 ± 0.022 | 0.580 ± 0.017 |
 
-## Repo structure
+The shared model is well calibrated (expected calibration error 0.044 ± 0.01).
 
-```
-brain-decoding/
-├── .gitignore, requirements.txt, config.yaml, sessions.yaml, run_all.py, README.md
-├── src/
-│   ├── common/      settings.py, checks.py
-│   ├── data/        sessions.py, clean_trials.py, neurons.py, features.py, build_dataset.py
-│   ├── models/      models.py, splits.py, baselines.py, experiments.py, run_experiments.py
-│   ├── evaluation/  calibration.py, metrics.py, statistics.py, make_tables.py
-│   └── analysis/    eda.py, plots.py, controls.py, run_controls.py, make_figures.py
-├── app/             dashboard.py
-├── notebooks/       01_ ... 11_
-├── tests/           test_<yourname>.py
-├── data/raw/        IBL downloads (never uploaded)
-├── data/processed/  10 ready sessions
-├── results/         predictions/, tables/, figures/
-└── docs/            data_card.md, literature_notes.md, report parts, final_report.md, slides.pdf
-```
+**Honest findings:**
 
-## Install
+- A single shared model is less accurate than a model retrained per animal. Reading a variable, shared neuron set across animals trades accuracy for one deployable, interpretable model.
+- **Self-supervised pretraining did not help** on this dataset: with pretraining 0.748 AUC versus 0.759 without, a difference within seed variance.
+- **Transfer to an unseen animal is near chance**: leave-one-session-out AUC is 0.496 ± 0.064 for the transformer and 0.541 ± 0.096 for a region-pooled linear baseline. Pre-movement choice signals here do not transfer across animals through shared regions.
+- **Graceful degradation**: dropping neurons at decode time lowers AUC smoothly, from 0.78 with all neurons to 0.73 at half removed and 0.58 at 90% removed.
+
+Reproduce every number:
 
 ```
-git clone https://github.com/Mustafa-elsherif/brain-decoding.git
-cd brain-decoding
+python -m src.models.run_experiments
+```
+
+This writes the result tables to `results/model/` and the serialized artifact to `artifacts/`.
+
+## Architecture
+
+<p align="center">
+  <img src="docs/architecture.svg" alt="Architecture" width="820" />
+</p>
+
+- `src/data/` builds the ten processed sessions from IBL (firing rates in the pre-movement window).
+- `src/models/` holds the baselines, the set transformer, training, and serialization.
+- `src/evaluation/` holds metrics and resampling statistics.
+- `api/` is the FastAPI service that serves the model.
+- `web/` is the static dashboard with in-browser inference.
+
+## Quickstart
+
+```
+git clone https://github.com/Mustafa-elsherif/volition.git
+cd volition
 py -3.12 -m venv .venv
 .venv\Scripts\activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-On Mac or Linux use `python3.12 -m venv .venv` and `source .venv/bin/activate`.
+On macOS or Linux use `python3.12 -m venv .venv` and `source .venv/bin/activate`.
 
-## Run commands
+Run the backend (loads `artifacts/` at startup):
 
-| # | Command | Reads -> writes |
+```
+cd api
+uvicorn app.main:app --reload
+```
+
+Serve the dashboard locally:
+
+```
+cd web
+python -m http.server 8099
+# open http://localhost:8099
+```
+
+## API
+
+The backend serves the same model. Send a trial as a list of neurons, each with a
+z-scored pre-movement firing rate and a Beryl region acronym.
+
+```bash
+curl -X POST "http://localhost:8000/decode" \
+  -H "content-type: application/json" \
+  -d '{"neurons": [{"rate": 1.8, "region": "VISp"}, {"rate": -0.4, "region": "CP"}]}'
+```
+
+```json
+{
+  "probability": 0.73,
+  "choice": "Right (choice = +1)",
+  "confidence": 0.46,
+  "region_contributions": [{"region": "VISp", "attention": 0.31, "n_neurons": 1}]
+}
+```
+
+| Method | Path | Purpose |
 |---|---|---|
-| 1 | `python -m src.data.build_dataset` | sessions.yaml + IBL -> data/processed/ |
-| 2 | `python -m src.models.run_experiments` | data/processed/ -> results/predictions/ |
-| 3 | `python -m src.evaluation.make_tables` | predictions -> 5 tables |
-| 4 | `python -m src.analysis.run_controls` | predictions -> 3 tables |
-| 5 | `python -m src.analysis.make_figures` | data + 8 tables -> 8 figures |
-| all | `python run_all.py` (`--quick` = first session only) | runs 1 -> 5 in order |
-| app | `streamlit run app/dashboard.py` | opens the dashboard |
+| POST | `/decode` | Decode one trial with per-neuron and per-region attributions |
+| GET | `/model-info` | Model metadata and held-out metrics |
+| GET | `/samples` | Bundled sample trials |
+| POST | `/assistant` | Grounded multilingual assistant |
 
-## Team
+Interactive API docs are at `/docs` when the server is running. See [api/README.md](api/README.md).
 
-- Mustafa (team leader)
-- Ahmed
-- Mohamed
-- Omar
+## Tests
 
-## References
+```
+python -m pytest            # core pipeline and models
+cd api && python -m pytest  # API contract tests
+```
 
-- IBL Brain-Wide Map data release (CC-BY 4.0), International Brain Laboratory: https://openalyx.internationalbrainlab.org
-- IBL Nature (2025) paper: link to be added (see `docs/literature_notes.md`)
-- BrainWideBench (2026) paper: link to be added (see `docs/literature_notes.md`)
+## Data and licence
 
-*No results yet. They are added in Stage 4.*
+Data: International Brain Laboratory Brain-Wide Map, release `2023_12_bwm_release`,
+CC-BY 4.0. See [docs/data_card.md](docs/data_card.md). Volition decodes an offline
+research dataset, not a live brain-computer interface.
+
+Code is released under the [MIT License](LICENSE).

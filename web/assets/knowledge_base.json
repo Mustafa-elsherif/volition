@@ -1,0 +1,86 @@
+[
+  {
+    "id": "overview",
+    "title": "What Volition is",
+    "tags": ["about", "product", "what", "intro"],
+    "text": "Volition is a neural choice decoder. It reads the firing rates of many neurons recorded in a mouse brain in the 0.1 second before the animal moves a wheel, and predicts which way the mouse chose. It ships one model that works across recording sessions from different animals, runs in the browser with no server, and explains each prediction by showing which neurons and brain regions drove it."
+  },
+  {
+    "id": "task",
+    "title": "The decoding task",
+    "tags": ["task", "choice", "mouse", "wheel", "problem"],
+    "text": "A mouse sees a visual stimulus on the left or right and turns a wheel to report its choice. Electrodes record spikes from hundreds of neurons across many brain regions. The decoding task is binary: from the per-neuron firing rates in the pre-movement window, predict the mouse's choice. The window ends at movement onset, so nothing after the movement can leak into the prediction."
+  },
+  {
+    "id": "dataset",
+    "title": "The dataset",
+    "tags": ["data", "ibl", "dataset", "sessions", "mice", "source"],
+    "text": "The data comes from the International Brain Laboratory Brain-Wide Map, a public release under a CC-BY 4.0 licence. Volition uses ten sessions from ten different mice, with at most two sessions per lab. Each session has a few hundred trials and a few hundred neurons tagged with their Beryl brain-region acronym. Trials are cleaned with the official inclusion criteria and aligned to the first wheel movement."
+  },
+  {
+    "id": "model",
+    "title": "The model",
+    "tags": ["model", "transformer", "architecture", "how", "attention"],
+    "text": "The decoder is a permutation-invariant set transformer. Each neuron becomes a token made of its firing rate and an embedding of its brain region. Self-attention pools the neurons into one trial vector, and a small head predicts the choice. Because region identities are shared across sessions, a single set of weights can read sessions that have completely different neurons. There is no neuron ordering, so the model handles any neuron count and any missing neurons by design."
+  },
+  {
+    "id": "pretraining",
+    "title": "Self-supervised pretraining",
+    "tags": ["pretraining", "ssl", "self-supervised", "masking"],
+    "text": "Before learning to decode choice, the model can be pretrained with a self-supervised task: a fraction of neuron tokens is masked and the model learns to reconstruct their firing rates, using no choice labels. On this dataset pretraining did not give a reliable improvement over training from scratch. The difference was within the variation across random seeds, so Volition reports it as a neutral result rather than a gain."
+  },
+  {
+    "id": "performance",
+    "title": "How well it works",
+    "tags": ["performance", "accuracy", "auc", "metrics", "results", "score"],
+    "text": "Performance is measured on held-out trials the model never trained on, averaged over several seeds. The single shared transformer decodes choice well above chance and is well calibrated. Per-session models that are retrained for one animal reach higher accuracy, which is the price of one model that spans animals. The exact current numbers are reported in the model card and the dashboard."
+  },
+  {
+    "id": "crosssession",
+    "title": "Transfer to a new animal",
+    "tags": ["transfer", "cross-session", "generalize", "new mouse", "unseen"],
+    "text": "Predicting the choice of a mouse the model has never seen, from only shared brain regions, is close to chance for both the transformer and a linear baseline. This is an honest negative result: pre-movement choice signals in this data do not transfer across animals through region identity alone. Volition reports this openly rather than hiding it."
+  },
+  {
+    "id": "robustness",
+    "title": "Missing neurons and regions",
+    "tags": ["robustness", "dropout", "missing", "reliability", "degrade"],
+    "text": "Because the model reads a set of neurons, dropping neurons at prediction time is natural. Volition measures how accuracy falls as a growing fraction of neurons is removed, and when a whole brain region is knocked out. The decoder degrades gradually rather than breaking, which matters for real recordings where some channels are always lost."
+  },
+  {
+    "id": "explanation",
+    "title": "Why a prediction was made",
+    "tags": ["explain", "interpret", "contribution", "attention", "why"],
+    "text": "Every prediction comes with the pooling attention over neurons. Volition shows the neurons that received the most attention and sums attention by brain region, so you can see which regions the decision leaned on. Attention is a faithful readout of what the model pooled, not a post-hoc guess."
+  },
+  {
+    "id": "api",
+    "title": "Using the API",
+    "tags": ["api", "rest", "endpoint", "request", "integrate", "code"],
+    "text": "The backend is a FastAPI service. POST a trial to /decode as a list of neurons, each with a z-scored firing rate and a Beryl region acronym, and it returns the choice probability, the decoded choice, a confidence, and the per-neuron and per-region contributions. GET /model-info returns the model metadata and metrics. The same model also runs fully in the browser, so the live demo needs no server."
+  },
+  {
+    "id": "dashboard",
+    "title": "Using the dashboard",
+    "tags": ["dashboard", "demo", "frontend", "use", "how to"],
+    "text": "Open the dashboard, pick one of the bundled sample trials or load your own, and run the decoder. You see the predicted choice, the confidence, the probability, and a breakdown of which neurons and regions drove the prediction. Inference runs in your browser with ONNX Runtime Web, so your data never leaves the page."
+  },
+  {
+    "id": "limits",
+    "title": "Limits and honest scope",
+    "tags": ["limits", "limitations", "caveats", "scope", "honest"],
+    "text": "Volition decodes an offline, cleaned research dataset, not a live brain-computer interface. Results hold for the retained trials and the chosen pre-movement window. Choice is correlated with the stimulus and the animal's prior, so the decoder reads a mix of signals, not a pure motor intention. It does not generalize to unseen animals. These limits are stated so the numbers are not over-read."
+  },
+  {
+    "id": "privacy",
+    "title": "Data and privacy",
+    "tags": ["privacy", "data", "security", "safe"],
+    "text": "The demo runs inference in your browser, so any trial you load stays on your device. The bundled samples are public IBL data. The optional assistant, when connected to its backend, sends only your question and grounded project context to answer you, never your neural data."
+  },
+  {
+    "id": "scope_guard",
+    "title": "What the assistant covers",
+    "tags": ["assistant", "help", "topic", "capabilities"],
+    "text": "This assistant answers questions about Volition: the decoding task, the dataset, the model, performance, robustness, interpretation, the API, and the dashboard. It does not give medical, clinical, or unrelated advice, and it will say so if asked something outside the project."
+  }
+]
