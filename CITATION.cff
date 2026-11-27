@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite it as below."
+title: "Volition: A Region-Tagged Set Transformer for Shared Choice Decoding Across the Brain-Wide Map"
+abstract: >-
+  Volition decodes a mouse's binary wheel choice from the pre-movement firing rates
+  of recorded neurons across the IBL Brain-Wide Map. A single permutation-invariant
+  set transformer, in which each neuron is a token formed from its firing rate and a
+  brain-region embedding, reads sessions with different and non-overlapping neurons,
+  runs in the browser, and explains each prediction with per-region attention.
+type: software
+authors:
+  - family-names: Abdelraheem
+    given-names: Mustafa Nabil
+    affiliation: "El Sewedy University of Technology, Cairo, Egypt"
+    email: mustafaelsherif99@gmail.com
+version: "1.0.0"
+date-released: "2026-11-27"
+license: MIT
+repository-code: "https://github.com/Mustafa-elsherif/volition"
+url: "https://mustafa-elsherif.github.io/volition/"
+keywords:
+  - neural decoding
+  - set transformer
+  - permutation invariance
+  - brain-wide map
+  - brain-computer interface
+  - calibration
