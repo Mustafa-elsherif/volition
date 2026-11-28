@@ -25,3 +25,19 @@ keywords:
   - brain-wide map
   - brain-computer interface
   - calibration
+doi: "10.5281/zenodo.24616025"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24616025"
+    description: "Zenodo preprint"
+preferred-citation:
+  type: article
+  title: "A Region-Tagged Set Transformer for Shared Choice Decoding Across the Brain-Wide Map, and the Limits of Region-Level Transfer"
+  authors:
+    - family-names: Abdelraheem
+      given-names: Mustafa Nabil
+      affiliation: "El Sewedy University of Technology, Cairo, Egypt"
+  doi: "10.5281/zenodo.24616025"
+  year: 2026
+  publisher:
+    name: Zenodo

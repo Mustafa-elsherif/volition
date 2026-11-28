@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://mustafa-elsherif.github.io/volition/"><img src="https://img.shields.io/badge/live%20demo-online-ffb24c" alt="Live demo" /></a>
-  <img src="https://img.shields.io/badge/paper-IEEE%20EMBC%202027%20(in%20prep)-b31b1b" alt="Paper" />
+  <a href="https://doi.org/10.5281/zenodo.24616025"><img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.24616025-blue" alt="DOI" /></a>
   <img src="https://img.shields.io/badge/release-v1.0-2f6fd6" alt="Release" />
   <img src="https://img.shields.io/badge/license-MIT-555" alt="License" />
 </p>
@@ -29,19 +29,21 @@
 
 > **A Region-Tagged Set Transformer for Shared Choice Decoding Across the Brain-Wide Map, and the Limits of Region-Level Transfer**
 > Mustafa Nabil Abdelraheem (El Sewedy University of Technology, Cairo, Egypt)
-> Target venue: IEEE EMBC 2027 (in preparation).
+> Published as a preprint on Zenodo: [10.5281/zenodo.24616025](https://doi.org/10.5281/zenodo.24616025)
 
 ```bibtex
-@inproceedings{abdelraheem2027volition,
+@misc{abdelraheem2026volition,
   title     = {A Region-Tagged Set Transformer for Shared Choice Decoding
                Across the Brain-Wide Map, and the Limits of Region-Level Transfer},
   author    = {Abdelraheem, Mustafa Nabil},
-  booktitle = {Submitted to IEEE EMBC},
-  year      = {2027}
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.24616025},
+  url       = {https://doi.org/10.5281/zenodo.24616025}
 }
 ```
 
-A machine-readable citation is in [CITATION.cff](CITATION.cff).
+A machine-readable citation
 
 ## Overview
 
