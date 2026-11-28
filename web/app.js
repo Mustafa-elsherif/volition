@@ -279,16 +279,12 @@ curl -X POST <span class="s">"$API/decode"</span> \\
 /* ---------------- boot ---------------- */
 async function boot() {
   renderApiSample();
-  try {
-    await loadAssistant(ASSETS);
-  } catch (e) { /* assistant optional */ }
-  setFollowups(["What is Volition?", "How does the model work?", "How well does it perform?"]);
-  addMsg("Hello. Ask me about the decoder, the data, the results, or how to use the demo.", "bot");
 
+  // Honest results render first, independent of the assistant and the model.
   try {
     metrics = await fetch(`${ASSETS}/metrics.json`).then((r) => r.json());
     renderMetrics();
-  } catch (e) { /* metrics optional before sweep wiring */ }
+  } catch (e) { /* metrics optional */ }
 
   // Samples load independently of the model, so the hero and workbench render even
   // if the inference runtime is slow or blocked.
@@ -310,6 +306,11 @@ async function boot() {
     console.error(e);
     return;
   }
+
+  // Assistant (grounded, optional), after the primary content is on screen.
+  try { await loadAssistant(ASSETS); } catch (e) { /* assistant optional */ }
+  setFollowups(["What is Volition?", "How does the model work?", "How well does it perform?"]);
+  addMsg("Hello. Ask me about the decoder, the data, the results, or how to use the demo.", "bot");
 
   // The model enables live decoding and attention coloring.
   try {
